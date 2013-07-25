@@ -200,6 +200,9 @@ var runWebAppServer = function () {
   if (process.env.PORT && !_.has(deployConfig.boot.bind, 'localPort')) {
     deployConfig.boot.bind.localPort = parseInt(process.env.PORT);
   }
+  if (process.env.METEOR_BIND_IP && !_.has(deployConfig.boot.bind, 'localIp')) {
+    deployConfig.boot.bind.localIp = process.env.METEOR_BIND_IP;
+  }
   copyEnvVarToDeployConfig(deployConfig, "MONGO_URL", "mongo-livedata", "url");
 
   // webserver
@@ -440,7 +443,7 @@ var runWebAppServer = function () {
 
     // only start listening after all the startup code has run.
     var bind = deployConfig.boot.bind;
-    httpServer.listen(bind.localPort || 0, Meteor.bindEnvironment(function() {
+    httpServer.listen(bind.localPort || 0, bind.localIp || '0.0.0.0', Meteor.bindEnvironment(function() {
       if (argv.keepalive || true)
         console.log("LISTENING"); // must match run.js
       var port = httpServer.address().port;
